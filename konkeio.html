@@ -1,7 +1,7 @@
 <script type="text/javascript">
   RED.nodes.registerType('konkeio-discover', {
     category: '控客',
-    color: '#b3afff',
+    color: '#45862b',
     paletteLabel: '发现',
     label() { return this.name || '发现' },
     defaults: {
@@ -14,15 +14,13 @@
   })
   RED.nodes.registerType('konkeio-action', {
     category: '控客',
-    color: '#b3afff',
+    color: '#45862b',
     paletteLabel: '操作',
     label() { return this.name || '操作' },
     defaults: {
       name:{value:''},
       ip: { value: '' },
-      mac: { value: '' },
-      password: { value: '' },
-      status: { value: 'auto' }
+      sw: { value: 'auto' }
     },
     inputs: 1,
     outputs: 1,
@@ -33,11 +31,11 @@
 
 <script type="text/x-red" data-template-name="konkeio-discover">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i>名字</label>
+    <label for="node-input-name"><i class="icon-tag"></i>名称</label>
     <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-timeout"><i class="icon-tag"></i>超时(毫秒)</label>
+    <label for="node-input-timeout"><i></i>超时(毫秒)</label>
     <input type="text" id="node-input-timeout" placeholder="1000">
   </div>
 </script>
@@ -54,24 +52,16 @@
 
 <script type="text/x-red" data-template-name="konkeio-action">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i>名字</label>
+    <label for="node-input-name"><i class="icon-tag"></i>名称</label>
     <input type="text" id="node-input-name">
   </div>
   <div class="form-row">
-    <label for="node-input-ip"><i class="icon-tag"></i>设备IP</label>
+    <label for="node-input-ip"><i></i>设备IP</label>
     <input type="text" id="node-input-ip" placeholder="192.168.1.1">
   </div>
   <div class="form-row">
-    <label for="node-input-mac"><i class="icon-tag"></i>设备MAC</label>
-    <input type="text" id="node-input-mac" placeholder="00:00:00:00:00:00">
-  </div>
-  <div class="form-row">
-    <label for="node-input-password"><i class="icon-tag"></i>设备密码</label>
-    <input type="text" id="node-input-password">
-  </div>
-  <div class="form-row">
-    <label for="node-input-status"><i class="icon-tag"></i>状态</label>
-    <select id="node-input-status">
+    <label for="node-input-sw"><i></i>状态</label>
+    <select id="node-input-sw">
       <option value="auto">继承</option>
       <option value="check">检查</option>
       <option value="open">打开</option>

@@ -27,6 +27,7 @@ const decrypt = message => {
 
 // 广播探知局域网的设备信息
 const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolve, reject) => {
+  // console.log('discover', timeout, ip)
   const list = []
   const socket = dgram.createSocket('udp4')
   socket.on('listening', () => socket.setBroadcast(true))
@@ -46,6 +47,7 @@ const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolv
 // 变更状态和检查状态
 // status取值可以为open,close,check
 const action = (ip, mac, password, status) => new Promise((resolve, reject) => {
+  // console.log('action', ip, mac, password, status)
   let timer = 0
   const socket = dgram.createSocket('udp4')
   const cmd = `lan_phone%${mac}%${password}%${status}%relay`
@@ -84,15 +86,36 @@ module.exports = RED => {
       RED.nodes.createNode(this, config)
       this.on('input', async msg => {
         try {
-          let act = config.status
-          act = act === 'auto'? (!!msg.payload ? 'open' : 'close'): act
-          act = act === 'auto' ? 'check' : act
-          const status = await action(config.ip, config.mac, config.password, act)
-          let payload = status === 'open'? true: false
-          msg.status = status
-          msg.payload = payload
+          // 查询这个ip的相关信息
+          const list = await discover(200, config.ip)
+          const { mac, password, status } = list[0] || {}
+
+          if(status == null){
+            throw 'check fail'
+          }
+
+          let result = status
+          let act = ''
+          // 如果为自动模式则直接通过输入的流来决定动作
+          if (config.sw == 'auto') {
+            act = !!msg.payload ? 'open' : 'close'
+          }
+          // 如果配置的是开或关则直接配置动作
+          else if (config.sw == 'open' || config.sw == 'close') {
+            act = config.sw
+          }
+          // 如果动作不为空则为自动模式或开关模式
+          // 并且满足动作和查询到的状态不同则才调用
+          if (act != '' && act != status) {
+            result = await action(config.ip, mac, password, act)
+          }
+
+          msg.status = result
+          msg.payload = result === 'open' ? true : false
           this.send(msg)
+          this.status({ shape: 'dot', fill: 'green', text: `操作: ${config.sw} 状态:${result}` })
         } catch (err) {
+          this.status({ shape: 'dot', fill: 'red', text: `操作: ${config.sw} 状态:${err}` })
           msg.payload = err
           this.send(msg)
         }
