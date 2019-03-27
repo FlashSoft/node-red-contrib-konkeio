@@ -82,7 +82,7 @@ module.exports = RED => {
   RED.nodes.registerType("konkeio-action", class {
     constructor(config) {
       RED.nodes.createNode(this, config)
-      console.log('config', config)
+      // console.log('config', config)
       this.on('input', async msg => {
         try{
           const status = await action(config.ip, config.mac, config.password, config.status)
