@@ -8,6 +8,12 @@
 
 基于以上两个功能可完成局域网控客开关的操作
 
+### 安装
+```
+# 去nodered目录
+npm i node-red-contrib-konkeio
+```
+
 
 ### nodered 范例流
 请直接导入使用
