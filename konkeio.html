@@ -3,8 +3,9 @@
     category: '控客',
     color: '#b3afff',
     paletteLabel: '发现',
-    label() { return '发现' },
+    label() { return this.name || '发现' },
     defaults: {
+      name: { value: '' },
       timeout: { value: 1000 }
     },
     inputs: 1,
@@ -15,12 +16,13 @@
     category: '控客',
     color: '#b3afff',
     paletteLabel: '操作',
-    label() { return '操作' },
+    label() { return this.name || '操作' },
     defaults: {
+      name:{value:''},
       ip: { value: '' },
       mac: { value: '' },
       password: { value: '' },
-      status: { value: 'check' }
+      status: { value: 'auto' }
     },
     inputs: 1,
     outputs: 1,
@@ -31,15 +33,30 @@
 
 <script type="text/x-red" data-template-name="konkeio-discover">
   <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i>名字</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
     <label for="node-input-timeout"><i class="icon-tag"></i>超时(毫秒)</label>
     <input type="text" id="node-input-timeout" placeholder="1000">
   </div>
 </script>
 <script type="text/x-red" data-help-name="konkeio-discover">
-  <p>发现局域网里的控客插座，输出设备列表以及设备的ip、mac、password以及stauts等信息，并把信息以json格式输出到下一个节点。</p>
+  <p>发现局域网里的控客设备列表</p>
+  <h3>输出</h3>
+  <dl class="message-properties">
+    <dt>payload<span class="property-type">various</span></dt>
+    <dd>设备列表数组</dd>
+    <dt>list<span class="property-type">string</span></dt>
+    <dd>设备列表数组字符串</dd>
+  </dl>
 </script>
 
 <script type="text/x-red" data-template-name="konkeio-action">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i>名字</label>
+    <input type="text" id="node-input-name">
+  </div>
   <div class="form-row">
     <label for="node-input-ip"><i class="icon-tag"></i>设备IP</label>
     <input type="text" id="node-input-ip" placeholder="192.168.1.1">
@@ -55,11 +72,25 @@
   <div class="form-row">
     <label for="node-input-status"><i class="icon-tag"></i>状态</label>
     <select id="node-input-status">
+      <option value="auto">继承</option>
+      <option value="check">检查</option>
       <option value="open">打开</option>
       <option value="close">关闭</option>
-      <option value="check">检查</option>
     </select>
   </div>
 </script>
 <script type="text/x-red" data-help-name="konkeio-action">
+  <p>检查或者操作控客设备</p>
+  <h3>输入</h3>
+  <dl class="message-properties">
+    <dt>payload<span class="property-type">boolean</span></dt>
+    <dd>传递给设备节点开关状态,当节点的状态为继承时生效,true为开,false为关</dd>
+  </dl>
+  <h3>输出</h3>
+  <dl class="message-properties">
+    <dt>payload<span class="property-type">boolean</span></dt>
+    <dd>开关状态,true为开,false为关</dd>
+    <dt>status<span class="property-type">string</span></dt>
+    <dd>控客设备内部的值,取值可能为open,close,timeout等</dd>
+  </dl>
 </script>

@@ -5,7 +5,7 @@ const key = Buffer.from('6664736c3b6d6577726a6f706534353666647334666276666e6a776
 const port = 27431
 
 const zeroPad = (data) => {
-  if(data instanceof Buffer != true) {data = Buffer.from(data)}
+  if (data instanceof Buffer != true) { data = Buffer.from(data) }
   const bs = data.length % 16
   return data.length % 16 === 0 ? data : Buffer.concat([data, Buffer.alloc(16 - data.length % 16, 0)])
 }
@@ -26,7 +26,7 @@ const decrypt = message => {
 
 
 // 广播探知局域网的设备信息
-const discover = (timeout = 3000) => new Promise((resolve, reject) => {
+const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolve, reject) => {
   const list = []
   const socket = dgram.createSocket('udp4')
   socket.on('listening', () => socket.setBroadcast(true))
@@ -37,7 +37,7 @@ const discover = (timeout = 3000) => new Promise((resolve, reject) => {
     const [status] = info.split('#')
     list.push({ ip, mac, password, status })
   })
-  socket.send(encrypt('lan_phone%test%test%test%heart'), port, '255.255.255.255')
+  socket.send(encrypt('lan_phone%test%test%test%heart'), port, ip)
   setTimeout(() => {
     resolve(list)
     socket.close()
@@ -82,13 +82,17 @@ module.exports = RED => {
   RED.nodes.registerType("konkeio-action", class {
     constructor(config) {
       RED.nodes.createNode(this, config)
-      // console.log('config', config)
       this.on('input', async msg => {
-        try{
-          const status = await action(config.ip, config.mac, config.password, config.status)
-          msg.payload = status
+        try {
+          let act = config.status
+          act = act === 'auto'? (!!msg.payload ? 'open' : 'close'): act
+          act = act === 'auto' ? 'check' : act
+          const status = await action(config.ip, config.mac, config.password, act)
+          let payload = status === 'open'? true: false
+          msg.status = status
+          msg.payload = payload
           this.send(msg)
-        }catch(err) {
+        } catch (err) {
           msg.payload = err
           this.send(msg)
         }
