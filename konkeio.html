@@ -1,0 +1,65 @@
+<script type="text/javascript">
+  RED.nodes.registerType('konkeio-discover', {
+    category: '控客',
+    color: '#b3afff',
+    paletteLabel: '发现',
+    label() { return '发现' },
+    defaults: {
+      timeout: { value: 1000 }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'white-globe.png'
+  })
+  RED.nodes.registerType('konkeio-action', {
+    category: '控客',
+    color: '#b3afff',
+    paletteLabel: '操作',
+    label() { return '操作' },
+    defaults: {
+      ip: { value: '' },
+      mac: { value: '' },
+      password: { value: '' },
+      status: { value: 'check' }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'white-globe.png',
+    align: 'right'
+  })
+</script>
+
+<script type="text/x-red" data-template-name="konkeio-discover">
+  <div class="form-row">
+    <label for="node-input-timeout"><i class="icon-tag"></i>超时(毫秒)</label>
+    <input type="text" id="node-input-timeout" placeholder="1000">
+  </div>
+</script>
+<script type="text/x-red" data-help-name="konkeio-discover">
+  <p>发现局域网里的控客插座，输出设备列表以及设备的ip、mac、password以及stauts等信息，并把信息以json格式输出到下一个节点。</p>
+</script>
+
+<script type="text/x-red" data-template-name="konkeio-action">
+  <div class="form-row">
+    <label for="node-input-ip"><i class="icon-tag"></i>设备IP</label>
+    <input type="text" id="node-input-ip" placeholder="192.168.1.1">
+  </div>
+  <div class="form-row">
+    <label for="node-input-mac"><i class="icon-tag"></i>设备MAC</label>
+    <input type="text" id="node-input-mac" placeholder="00:00:00:00:00:00">
+  </div>
+  <div class="form-row">
+    <label for="node-input-password"><i class="icon-tag"></i>设备密码</label>
+    <input type="text" id="node-input-password">
+  </div>
+  <div class="form-row">
+    <label for="node-input-status"><i class="icon-tag"></i>状态</label>
+    <select id="node-input-status">
+      <option value="open">打开</option>
+      <option value="close">关闭</option>
+      <option value="check">检查</option>
+    </select>
+  </div>
+</script>
+<script type="text/x-red" data-help-name="konkeio-action">
+</script>

@@ -1,0 +1,26 @@
+{
+  "name": "node-red-contrib-konkeio",
+  "version": "1.0.0",
+  "description": "控客设备控制",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlashSoft/node-red-contrib-konkeio.git"
+  },
+  "keywords": [
+    "nodered",
+    "konke",
+    "控客"
+  ],
+  "node-red": {
+    "nodes": {
+      "konkeio": "konkeio.js"
+    }
+  },
+  "author": "FlashSoft",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlashSoft/node-red-contrib-konkeio/issues"
+  },
+  "homepage": "https://github.com/FlashSoft/node-red-contrib-konkeio#readme"
+}
