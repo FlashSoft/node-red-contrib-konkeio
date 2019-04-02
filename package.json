@@ -8,6 +8,7 @@
     "url": "git+https://github.com/FlashSoft/node-red-contrib-konkeio.git"
   },
   "keywords": [
+    "node-red",
     "nodered",
     "konke",
     "控客"
