@@ -109,11 +109,11 @@ module.exports = RED => {
             act = config.sw
           }
           else if (config.sw == 'ir_send') {
-            act = 'operate#3031#emit#' + config.group + '#' + config.id
+            act = 'operate#3031#emit#' + config.group + '#' + config.attr_id
             action_type = 'uart'
           }
           else if (config.sw == 'ir_learn') {
-            act = 'operate#3031#learn#' + config.group + '#' + config.id
+            act = 'operate#3031#learn#' + config.group + '#' + config.attr_id
             action_type = 'uart'
           }
           else if (config.sw == 'ir_stop_learn') {
@@ -121,7 +121,7 @@ module.exports = RED => {
             action_type = 'uart'
           }
           else if (config.sw == 'ir_delete') {
-            act = 'operate#3031#deletekey#' + config.group + '#' + config.id
+            act = 'operate#3031#deletekey#' + config.group + '#' + config.attr_id
             action_type = 'uart'
           }
           else if (config.sw == 'ir_delete_group') {
