@@ -20,7 +20,9 @@
     defaults: {
       name:{value:''},
       ip: { value: '' },
-      sw: { value: 'auto' }
+      sw: { value: 'auto' },
+      group: { value: 'konkeio' },
+      attr_id: { value: '1000' }
     },
     inputs: 1,
     outputs: 1,
@@ -66,7 +68,20 @@
       <option value="check">检查</option>
       <option value="open">打开</option>
       <option value="close">关闭</option>
+	  <option value="ir_send">IR发射</option>
+	  <option value="ir_learn">IR学习</option>
+	  <option value="ir_stop_learn">IR停止学习</option>
+	  <option value="ir_delete">IR删除</option>
+	  <option value="ir_delete_group">IR删除组</option>
     </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-group"><i></i>组</label>
+    <input type="text" id="node-input-group" placeholder="konkeio">
+  </div>
+  <div class="form-row">
+    <label for="node-input-attr_id"><i></i>ID参数</label>
+    <input type="text" id="node-input-attr_id" placeholder="1000-99999">
   </div>
 </script>
 <script type="text/x-red" data-help-name="konkeio-action">
