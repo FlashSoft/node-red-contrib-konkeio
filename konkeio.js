@@ -26,7 +26,7 @@ const decrypt = message => {
 
 
 // 广播探知局域网的设备信息
-const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolve, reject) => {
+const discover = (timeout = 1000, ip = '255.255.255.255', speed = false) => new Promise((resolve, reject) => {
   // console.log('discover', timeout, ip)
   const list = []
   const socket = dgram.createSocket('udp4')
@@ -37,12 +37,18 @@ const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolv
     const [type, mac, password, info] = data.split('%')
     const [status] = info.split('#')
     list.push({ ip, mac, password, status })
+    if(speed){
+      resolve(list)
+      socket.close()
+    }
   })
   socket.send(encrypt('lan_phone%test%test%test%heart'), port, ip)
-  setTimeout(() => {
-    resolve(list)
-    socket.close()
-  }, timeout)
+  if(!speed){
+    setTimeout(() => {
+      resolve(list)
+      socket.close()
+    }, timeout)
+  }
 })
 // 变更状态和检查状态
 // status取值可以为open,close,check
@@ -90,7 +96,7 @@ module.exports = RED => {
       this.on('input', async msg => {
         try {
           // 查询这个ip的相关信息
-          const list = await discover(200, config.ip)
+          const list = await discover(1000, config.ip, true)
           const { mac, password, status } = list[0] || {}
 
           if(status == null){
