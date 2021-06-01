@@ -26,7 +26,7 @@ const decrypt = message => {
 
 
 // 广播探知局域网的设备信息
-const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolve, reject) => {
+const discover = (timeout = 1000, ip = '255.255.255.255', speed = false) => new Promise((resolve, reject) => {
   // console.log('discover', timeout, ip)
   const list = []
   const socket = dgram.createSocket('udp4')
@@ -37,20 +37,26 @@ const discover = (timeout = 1000, ip = '255.255.255.255') => new Promise((resolv
     const [type, mac, password, info] = data.split('%')
     const [status] = info.split('#')
     list.push({ ip, mac, password, status })
+    if(speed){
+      resolve(list)
+      socket.close()
+    }
   })
   socket.send(encrypt('lan_phone%test%test%test%heart'), port, ip)
-  setTimeout(() => {
-    resolve(list)
-    socket.close()
-  }, timeout)
+  if(!speed){
+    setTimeout(() => {
+      resolve(list)
+      socket.close()
+    }, timeout)
+  }
 })
 // 变更状态和检查状态
 // status取值可以为open,close,check
-const action = (ip, mac, password, status) => new Promise((resolve, reject) => {
+const action = (ip, mac, password, status, action_type) => new Promise((resolve, reject) => {
   // console.log('action', ip, mac, password, status)
   let timer = 0
   const socket = dgram.createSocket('udp4')
-  const cmd = `lan_phone%${mac}%${password}%${status}%relay`
+  const cmd = `lan_phone%${mac}%${password}%${status}%${action_type}`
 
   socket.on('listening', () => socket.setBroadcast(true))
   socket.on('message', (message, rinfo) => {
@@ -58,7 +64,10 @@ const action = (ip, mac, password, status) => new Promise((resolve, reject) => {
     const [type, mac, password, status] = data.split('%')
     socket.close()
     clearTimeout(timer)
-    if (status == 'open' || status == 'close') { resolve(status) }
+    if (status == 'open'
+      || status == 'close'
+      || status.indexOf('operate') != -1
+    ) { resolve(status) }
     else { reject(status) }
   })
   socket.send(encrypt(cmd), port, ip)
@@ -87,7 +96,7 @@ module.exports = RED => {
       this.on('input', async msg => {
         try {
           // 查询这个ip的相关信息
-          const list = await discover(200, config.ip)
+          const list = await discover(1000, config.ip, true)
           const { mac, password, status } = list[0] || {}
 
           if(status == null){
@@ -96,6 +105,7 @@ module.exports = RED => {
 
           let result = status
           let act = ''
+		      let action_type = 'relay'
           // 如果为自动模式则直接通过输入的流来决定动作
           if (config.sw == 'auto') {
             act = !!msg.payload ? 'open' : 'close'
@@ -104,10 +114,30 @@ module.exports = RED => {
           else if (config.sw == 'open' || config.sw == 'close') {
             act = config.sw
           }
+          else if (config.sw == 'ir_send') {
+            act = 'operate#3031#emit#' + config.group + '#' + config.attr_id
+            action_type = 'uart'
+          }
+          else if (config.sw == 'ir_learn') {
+            act = 'operate#3031#learn#' + config.group + '#' + config.attr_id
+            action_type = 'uart'
+          }
+          else if (config.sw == 'ir_stop_learn') {
+            act = 'operate#3031#quit'
+            action_type = 'uart'
+          }
+          else if (config.sw == 'ir_delete') {
+            act = 'operate#3031#deletekey#' + config.group + '#' + config.attr_id
+            action_type = 'uart'
+          }
+          else if (config.sw == 'ir_delete_group') {
+            act = 'operate#3031#delete#' + config.group
+            action_type = 'uart'
+          }
           // 如果动作不为空则为自动模式或开关模式
           // 并且满足动作和查询到的状态不同则才调用
           if (act != '' && act != status) {
-            result = await action(config.ip, mac, password, act)
+            result = await action(config.ip, mac, password, act, action_type)
           }
 
           msg.status = result
